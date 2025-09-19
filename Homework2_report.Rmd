@@ -4,7 +4,7 @@ output: html_document
 ---
 
 
-## Name
+## Name: Medhavi Jambhekar
 
 Please enter your name here.
 
@@ -15,7 +15,8 @@ Read in the data with `read_csv()` and store the data as an R object named `data
 
 ```{r}
 ## Load the data and any necessary packages here.
-
+dataset = read.csv("maacs.csv.gz")
+dataset
 ```
 
 ## Part 1
@@ -26,12 +27,18 @@ Consider the statement "FEV1 values in children are higher in older children rel
 
 Write a function in R that takes the `dataset` object as an argument and returns `TRUE` if the statement above is true for the dataset and `FALSE` otherwise. 
 
+
 NOTE: In order to write this function, you will need to translate the statement above into something that can be checked with the data. There are many ways in which you can do that translation correctly and you only need to pick one way here. 
 
 NOTE: For this part, do not use any plots.
 
 ```{r}
 ## Write your function here
+rel <- function(dataset){
+  model <- lm(fev1 ~ age, data=dataset)
+  slope <- coef(model)["age"]
+  return (slope>0)
+}
 
 ```
 
@@ -44,13 +51,14 @@ How much does FEV1 change for a 1-year increase in the child's age?
 
 ```{r}
 ## Add your code here
-
+model <- lm(fev1 ~ age, data=dataset)
+coef(model)["age"]
 ```
 
 
 Write your data analysis statement interpreting the regression model here:
 
-
+Holding everything constant, for every year a child grows older, the child's FEV1 is estimated to increase by 0.17 liters on average.
 
 ## Part 3
 
@@ -60,17 +68,25 @@ NOTE: At least one supporting premise should use a plot.
 
 ```{r}
 ## Add your code here
+print ("The correlation")
+cor(dataset$age, dataset$fev1, use="complete.obs")
+
+print ("Diff in means")
+mean(dataset$fev[dataset$age < median(dataset$age, na.rm=TRUE)], na.rm=TRUE)
+mean(dataset$fev[dataset$age > median(dataset$age, na.rm=TRUE)], na.rm=TRUE)
+
+plot(dataset$age, dataset$fev, xlab="Years", ylab="fev1 liters", abline(model), col="pink")
 
 ```
 
 
 Write the three supporting premise statements here:
 
-1. 
+1. TIf the correlation between age and FEV1 is positive, it shows that older children typically have higher FEV1.
 
-2. 
+2. If the mean FEV1 is higher for the older group than the younger group, it shows that older children typically have higher FEV1.
 
-3. 
+3. If the plot slopes upwards, it shows that FEV1 increases as age increases.
 
 
 ## Part 4
@@ -86,18 +102,33 @@ For statements involving plots, instead of returning `TRUE` or `FALSE`, you func
 
 ```{r}
 ## Function for supporting premise statement 1
-
+prem1 <- function(dataset){
+  cor <- cor(dataset$age, dataset$fev1, use="complete.obs")
+  return (cor > 0)
+}
+prem1(dataset)
 ```
 
 
 ```{r}
 ## Function for supporting premise statement 2
-
+prem2 <- function(dataset){
+  medianAge <- median(dataset$age, na.rm=TRUE)
+  olderMed <- mean(dataset$fev[dataset$age > median(dataset$age, na.rm=TRUE)], na.rm=TRUE)
+  youngerMed <- mean(dataset$fev[dataset$age < median(dataset$age, na.rm=TRUE)], na.rm=TRUE)
+  return (youngerMed < olderMed)
+}
+prem2(dataset)
 ```
 
 
 ```{r}
 ## Function for supporting premise statement 3
+prem3 <- function(data){
+  model <- lm(fev1 ~ age, data=dataset)
+  plot(dataset$age, dataset$fev, xlab="Years", ylab="fev1 liters", main= "Actual plot", abline(model), col="pink")
+}
+prem3(dataset)
 
 ```
 
@@ -110,8 +141,10 @@ Execute each of your function and show that the produce the expected output.
 
 Describe one alternative to the primary statement "FEV1 values in children are higher in older children relative to younger children". 
 
-Create a fault tree for the alternative outcome describing how the alternative outcome could be realized in the data even if the primary statement were true.
+It may not just be age that's influencing FEV1 values, it could be other factors like more time outside, health, etc that is more responsible for the FEV1 increase than just age.
 
+
+Create a fault tree for the alternative outcome describing how the alternative outcome could be realized in the data even if the primary statement were true.
 Your fault tree should be created as a separate image and does not need to be created in R. Upload the image of the fault tree to Canvas.
 
 
