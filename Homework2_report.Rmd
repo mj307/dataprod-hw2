@@ -16,7 +16,7 @@ Read in the data with `read_csv()` and store the data as an R object named `data
 ```{r}
 ## Load the data and any necessary packages here.
 dataset = read.csv("maacs.csv.gz")
-dataset
+head(dataset)
 ```
 
 ## Part 1
@@ -69,7 +69,8 @@ NOTE: At least one supporting premise should use a plot.
 ```{r}
 ## Add your code here
 print ("The correlation")
-cor(dataset$age, dataset$fev1, use="complete.obs")
+cor <- cor(dataset$age, dataset$fev1, use="complete.obs")
+print (cor > 0.8)
 
 print ("Diff in means")
 mean(dataset$fev[dataset$age < median(dataset$age, na.rm=TRUE)], na.rm=TRUE)
@@ -82,7 +83,7 @@ plot(dataset$age, dataset$fev, xlab="Years", ylab="fev1 liters", abline(model), 
 
 Write the three supporting premise statements here:
 
-1. TIf the correlation between age and FEV1 is positive, it shows that older children typically have higher FEV1.
+1. If the correlation between age and FEV1 is greater than 0.8 it shows that there's a strong relationship between older children having higher FEV1.
 
 2. If the mean FEV1 is higher for the older group than the younger group, it shows that older children typically have higher FEV1.
 
@@ -104,7 +105,7 @@ For statements involving plots, instead of returning `TRUE` or `FALSE`, you func
 ## Function for supporting premise statement 1
 prem1 <- function(dataset){
   cor <- cor(dataset$age, dataset$fev1, use="complete.obs")
-  return (cor > 0)
+  return (cor > 0.8)
 }
 prem1(dataset)
 ```
@@ -130,6 +131,15 @@ prem3 <- function(data){
 }
 prem3(dataset)
 
+# hypothetical
+  x <- 1:20
+  y <- 0.8 * x + 4
+  plot(x, y,
+       xlab = "Age", ylab = "FEV1",
+       main = "Hypothetical",
+       col = "red")
+
+
 ```
 
 Execute each of your function and show that the produce the expected output.
@@ -146,5 +156,3 @@ It may not just be age that's influencing FEV1 values, it could be other factors
 
 Create a fault tree for the alternative outcome describing how the alternative outcome could be realized in the data even if the primary statement were true.
 Your fault tree should be created as a separate image and does not need to be created in R. Upload the image of the fault tree to Canvas.
-
-
